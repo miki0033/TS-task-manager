@@ -37,10 +37,53 @@ let inpOptions: Form.divInputOptions = {
   inputClass: classIntoList("border border-gray-300 rounded-md p-2"),
 };
 pForm.addInput(inpOptions);
-pForm.addSelect();
+let selectOptions: Form.divSelectOptions = {
+  className: classIntoList("border border-gray-300 rounded-md p-2"),
+  labelText: "Assegna a:",
+  inputId: "teamlist2",
+  selectClass: classIntoList("border border-gray-300 rounded-md p-2"),
+  options: optionData(getMember()),
+};
+pForm.addSelect(selectOptions);
+
 pForm.addSubmitButton();
 
 function classIntoList(cls: string): string[] {
   const lst: string[] = cls.split(" ");
+  return lst;
+}
+
+async function getMember(): any[] {
+  let dt = await fetch("http://127.0.0.1:5000/teamMember", {
+    //fetch dei membri del team
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    //body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      return data;
+    });
+  console.log(dt);
+
+  return dt;
+}
+
+function optionData(data: any): Form.optionData[] {
+  console.log(data);
+
+  const lst: Form.optionData[] = [];
+  data.forEach((element: any) => {
+    let obj: Form.optionData = {
+      value: element["id"],
+      optionText: element["nome"] + " " + element["cognome"],
+    };
+    lst.push(obj);
+  });
   return lst;
 }

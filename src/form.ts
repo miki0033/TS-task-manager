@@ -132,17 +132,16 @@ export class divInput extends DOMElement {
 export interface divSelectOptions {
   className?: string[];
   labelClass?: string[];
-
+  labelText?: string;
   inputId?: string;
   selectName?: string;
   selectClass?: string[];
-  option: [
-    {
-      value: string;
-      optionText: string;
-    }
-  ];
+  options: optionData[];
   optionClass?: string[];
+}
+export interface optionData {
+  value: string;
+  optionText: string;
 }
 
 export class divSelect extends DOMElement {
