@@ -1,4 +1,4 @@
-export default class DOMElement {
+export default abstract class DOMElement {
   p: any = null;
   children: HTMLElement[] = [];
 

@@ -43,15 +43,17 @@ export class Form extends DOMElement {
   /**
    * addInput
    */
-  public addInput(options: divInputOptions) {
+  public addInput(options: divInputOptions): HTMLInputElement {
     const pInput = new divInput(options);
     this.p.appendChild(pInput.getNode());
     this.children.push(pInput);
+    return pInput.getInputNode();
   }
   public addSelect(options: divSelectOptions) {
     const pInput = new divSelect(options);
     this.p.appendChild(pInput.getNode());
     this.children.push(pInput);
+    return pInput.getInputNode();
   }
 
   /**
@@ -62,6 +64,22 @@ export class Form extends DOMElement {
     this.p.appendChild(pBtn.getNode());
     this.children.push(pBtn);
   }
+
+  /**
+   * takeFormInputById
+   */
+  /*public takeFormInputById(takeid: string) {
+    let value: any;
+    for (let i = 0; i < this.children.length; i++) {
+      console.log(this.children[i].pInput);
+      if (this.children[i]?.pInput?.getInputId() == takeid) {
+        console.log(this.children[i].pInput);
+        value = this.children[i].pInput.value;
+        break;
+      }
+    }
+    return value;
+  }*/
 }
 export interface divInputOptions {
   className?: string[];
@@ -110,7 +128,7 @@ export class divInput extends DOMElement {
     //aggiungo id
     if (options.inputId) {
       this.pInput.id = options.inputId;
-      this.pLabel.id = options.inputId;
+      //this.pLabel.id = options.inputId;
     }
     if (options.inputType) {
       this.pInput.type = options.inputType;
@@ -126,6 +144,15 @@ export class divInput extends DOMElement {
   }
   public getNode() {
     return this.pDiv;
+  }
+  public getValue() {
+    return this.pInput.value;
+  }
+  /**
+   * getInputId
+   */
+  public getInputNode() {
+    return this.pInput;
   }
 }
 
@@ -173,19 +200,23 @@ export class divSelect extends DOMElement {
         this.pSelect.classList.add(cl);
       });
     }
+    //aggiungo i testi
+    if (options.labelText) {
+      this.pLabel.textContent = options.labelText;
+    }
 
     //aggiungo id
     if (options.inputId) {
       this.pSelect.id = options.inputId;
-      this.pLabel.id = options.inputId;
+      //this.pLabel.for = options.inputId;
     }
     //aggiungo name
     if (options.selectName) {
       this.pSelect.name = options.selectName;
     }
     //creo le option
-    if (options.option) {
-      options.option.forEach((opt) => {
+    if (options.options) {
+      options.options.forEach((opt: optionData) => {
         const pOption: HTMLOptionElement = document.createElement("option");
         pOption.value = opt.value;
         pOption.text = opt.optionText;
@@ -200,5 +231,8 @@ export class divSelect extends DOMElement {
   }
   public getNode() {
     return this.pDiv;
+  }
+  public getInputNode() {
+    return this.pSelect;
   }
 }
