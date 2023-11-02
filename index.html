@@ -11,6 +11,70 @@
   <body class="">
     <div id="app"></div>
     <div id="table"></div>
+
+    <div id="modal" class="hidden z-10 fixed overflow-auto bg-slate-100">
+      <div class="modal-content flex flex-col">
+        <div class="flex justify-end mb-2">
+          <button class="close">&times;</button>
+        </div>
+        <form id="modal-form" action="" method="post">
+          <div class="input items-center flex flex-col justify-around">
+            <div class="flex justify-between m-1">
+              <label for="titolo">Task:</label>
+              <input
+                type="text"
+                id="modtitolo"
+                class="border border-gray-300 rounded-md p-2"
+              />
+            </div>
+            <div id="select" class="flex justify-between m-1">
+              <label for="member">Assegna a:</label>
+              <select
+                name="teammember"
+                id="teamlist"
+                class="border border-gray-300 rounded-md p-2"
+              >
+                <!--<option value="${}">${}</option>
+              <option value="${}">${}</option>
+              <option value="${}">${}</option>
+              <option value="${}">${}</option>-->
+              </select>
+            </div>
+            <div id="select" class="flex justify-between m-1">
+              <label for="status">Stato:</label>
+              <select
+                name="status"
+                id="status"
+                class="border border-gray-300 rounded-md p-2"
+              >
+                <option value="ToDo">ToDo</option>
+                <option value="InProgress">InProgress</option>
+                <option value="Complete">Complete</option>
+              </select>
+            </div>
+            <div class="flex justify-between m-1">
+              <label for="scadenza">Data di scadenza:</label>
+              <input
+                type="date"
+                name="scadenza"
+                id="modscadenza"
+                class="border border-gray-300 rounded-md p-2"
+              />
+            </div>
+            <div class="flex justify-center m-2">
+              <button
+                type="submit"
+                id="salvaModifiche"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+              >
+                Salva
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

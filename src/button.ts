@@ -5,7 +5,7 @@ export interface ButtonOptions {
   id?: string;
   className?: string[];
   btnText: string;
-  onClick: (e: Event) => void;
+  onClick?: any;
 }
 
 export class Button extends DOMElement {
@@ -36,6 +36,12 @@ export class Button extends DOMElement {
 
   public getNode() {
     return this.pBtn;
+  }
+  /**
+   * addAttribute
+   */
+  public addAttribute(name: string, data: string) {
+    this.pBtn.setAttribute(name, data);
   }
 
   /**

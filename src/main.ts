@@ -11,7 +11,9 @@ import { Table, TableOptions } from "./table.ts";
 //selector
 const pApp = document.querySelector<HTMLDivElement>("#app");
 const pAppTable = document.querySelector<HTMLDivElement>("#table");
-
+const modal = document.querySelector<HTMLDivElement>("#modal");
+const closemodal = document.querySelector<HTMLButtonElement>("#close");
+//Creazione HTML
 const div1 = new Div(classIntoList("flex flex-col items-center"));
 pApp?.appendChild(div1.getNode());
 const div2 = new Div(classIntoList("w-6/12 flex flex-col items-center"));
@@ -67,11 +69,24 @@ const pScadenzaInput = pForm.addInput(scadenzaOption);
 pForm.addSubmitButton(submitOption);
 
 let tableOptions: TableOptions = {
-  //TODO
+  className: classIntoList("min-w-full divide-y divide-gray-200"),
+  colText: [
+    "Titolo",
+    "Membro",
+    "Stato",
+    "Data di assegnazione",
+    "Data di scadenza",
+  ],
+  thClass: classIntoList("text-left px-4 py-2 text-gray-800"),
 };
 const pTable = new Table(tableOptions);
 pAppTable?.appendChild(pTable.getNode());
+//Stato
+let targetTask: any;
 
+//MAIN
+getTask();
+//FUNZIONI
 function classIntoList(cls: string): string[] {
   const lst: string[] = cls.split(" ");
   return lst;
@@ -87,22 +102,16 @@ async function getMember(): Promise<any> {
     //body: JSON.stringify(data),
   })
     .then((response) => {
-      console.log("response:");
-      console.log(response);
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       return data;
     });
-  console.log(dt);
 
   return await dt;
 }
 
 function optionData(data: any): Form.optionData[] {
-  console.log(data);
-
   const lst: Form.optionData[] = [];
   data.forEach((element: any) => {
     let obj: Form.optionData = {
@@ -144,7 +153,85 @@ function setTask() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
-      pTaskList.addTask();
+      pTable.createRow(data);
     });
 }
+
+async function getTask() {
+  let dt: any = fetch("http://127.0.0.1:5000/getTask", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    //body: JSON.stringify(data),
+  })
+    .then((response) => {
+      /*console.log(response.json());*/
+      return response.json();
+    })
+    .then((data) => {
+      if (data?.code == 404) {
+        //html = "<p> Dati non trovati </p>";
+      } else {
+        data?.forEach((element: any) => {
+          pTable.createRow(element);
+          /*newhtml += `<tr class="hover:bg-gray-100">
+          <td class="border px-4 py-2">${element["titolo"]}</td>
+          <td class="border px-4 py-2">${element["nome"]} ${element["cognome"]}</td>
+          <td class="border px-4 py-2">${element["stato"]}</td>
+          <td class="border px-4 py-2">${element["assegnazione"]}</td>
+          <td class="border px-4 py-2">${element["scadenza"]}</td>
+          <td><button data-task="${element["id"]}" class="edit bg-yellow-500 rounded py-2 px-4 active:bg-yellow-600">Modifica</button></td>
+          <td><button data-task="${element["id"]}" class="delete bg-red-500 rounded py-2 px-4 active:bg-red-600">Cancella</button></td>
+          </tr>`;*/
+        });
+
+        /*html = openhtml + newhtml + closehtml;
+        arrTask = data;*/
+      }
+    });
+  return await dt;
+}
+
+//campi form modale
+const modtitolo = document.querySelector("#modtitolo") as HTMLInputElement;
+const modscadenza = document.querySelector("#modscadenza") as HTMLInputElement;
+const modteamid = document.querySelector("#teamlist2") as HTMLInputElement;
+const modstatus = document.querySelector("#status") as HTMLInputElement;
+
+//Modale
+modal!.addEventListener("submit", (event) => {
+  event.preventDefault();
+  let data = {
+    id: targetTask["id"],
+    titolo: modtitolo?.value,
+    scadenza: modscadenza?.value,
+    stato: modstatus?.value,
+    teamid: +modteamid?.value,
+  };
+
+  fetch("http://127.0.0.1:5000/updateTask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {});
+
+  modal!.style.display = "none";
+  getTask();
+});
+
+//Chiusura della modale
+closemodal!.addEventListener("click", () => {
+  modal!.style.display = "none";
+});
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal!.style.display = "none";
+  }
+};
