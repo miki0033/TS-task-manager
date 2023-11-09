@@ -102,15 +102,19 @@ export class Table extends DOMElement {
    */
   public createRow(rowData: any) {
     let tr = document.createElement("tr");
+    tr.id = rowData["id"];
     this.bodyRow.push(tr);
-    console.log(rowData);
+    //console.log(rowData);
 
     this.rowsData.push(rowData);
-    //console.log(this.getRowsData());
+    this.editRow(tr, rowData);
+  }
+
+  private editRow(tr: HTMLTableRowElement, rowData: any) {
     for (let index = 0; index < Object.keys(rowData).length - 2; index++) {
       const th = document.createElement("td");
       tr.appendChild(th);
-      console.log(fieldRowData[index]);
+      //console.log(fieldRowData[index]);
 
       th.textContent = rowData[fieldRowData[index]];
       th.id = String(index);
@@ -155,14 +159,15 @@ export class Table extends DOMElement {
     btn2.addAttribute("data-task", rowData["id"]);
     td2.appendChild(btn2.getNode());
     tr.appendChild(td2);
+    console.log(tr);
 
     this.renderRow();
   }
 
-  private renderRow() {
+  public renderRow() {
     //controllare se la rimozione funziona
 
-    //rimuove tutte le righr della tabella
+    //rimuove tutte le righe della tabella
     while (this.ptbody.firstChild) {
       this.ptbody.removeChild(this.ptbody.firstChild);
     }
@@ -171,6 +176,18 @@ export class Table extends DOMElement {
 
       this.ptbody.appendChild(prow);
     });
+  }
+  public editRowById(id: any, rowData: any) {
+    //rowData=titolo, cognome, stato, assegnazione, scadenza
+    for (let i = 0; i < this.bodyRow.length; i++) {
+      if (this.bodyRow[i].id == id) {
+        while (this.bodyRow[i].firstChild) {
+          this.bodyRow[i].removeChild(<Node>this.bodyRow[i].firstChild);
+        }
+        this.editRow(this.bodyRow[i], rowData);
+        console.log(this.bodyRow[i]);
+      }
+    }
   }
   private removeRowById(id: any) {
     for (let i = 0; i < this.bodyRow.length; i++) {
@@ -185,23 +202,23 @@ export class Table extends DOMElement {
   //EDIT
   public editTask = (e: any) => {
     let targetTask: any;
+
     const clicked = e.target as Element;
     //console.log(this);
     if (clicked.hasAttribute("data-task")) {
       const id = clicked.getAttribute("data-task");
       //console.log(id);
       //predere il campo dell' array con quell'id
-      console.log(this.rowsData);
+      //console.log(this.rowsData);
 
       this.rowsData.forEach((el: any) => {
         if (el["id"] == id) {
           targetTask = el;
         }
       });
-      //console.log(targetTask);
+      msgData.storeMsg("targetTask", targetTask);
+      console.log(targetTask);
       const modalmember = msgData.takeMsg("modalmember");
-      //console.log(modalmember);
-
       modalmember.optionSelected(targetTask.nome + " " + targetTask.cognome);
 
       if (clicked.classList.contains("edit")) {
@@ -246,6 +263,7 @@ export class Table extends DOMElement {
       })
       .then(() => {
         this.removeRowById(id);
+        this.renderRow();
       });
   };
 }

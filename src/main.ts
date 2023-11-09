@@ -15,6 +15,7 @@ const pAppTable = document.querySelector<HTMLDivElement>("#table");
 const modal = document.querySelector<HTMLDivElement>("#modal");
 const closemodal = document.querySelector<HTMLButtonElement>("#close");
 const modalselect = document.querySelector("#select");
+const modalbtn = document.querySelector<HTMLDivElement>("#salvaModifiche");
 //Stato
 let targetTask: any;
 let members: any = [];
@@ -215,19 +216,7 @@ async function getTask() {
       } else {
         data?.forEach((element: any) => {
           pTable.createRow(element);
-          /*newhtml += `<tr class="hover:bg-gray-100">
-          <td class="border px-4 py-2">${element["titolo"]}</td>
-          <td class="border px-4 py-2">${element["nome"]} ${element["cognome"]}</td>
-          <td class="border px-4 py-2">${element["stato"]}</td>
-          <td class="border px-4 py-2">${element["assegnazione"]}</td>
-          <td class="border px-4 py-2">${element["scadenza"]}</td>
-          <td><button data-task="${element["id"]}" class="edit bg-yellow-500 rounded py-2 px-4 active:bg-yellow-600">Modifica</button></td>
-          <td><button data-task="${element["id"]}" class="delete bg-red-500 rounded py-2 px-4 active:bg-red-600">Cancella</button></td>
-          </tr>`;*/
         });
-
-        /*html = openhtml + newhtml + closehtml;
-        arrTask = data;*/
       }
     });
   return await dt;
@@ -240,6 +229,7 @@ const modteamid = document.querySelector("#teamlist2") as HTMLInputElement;
 const modstatus = document.querySelector("#status") as HTMLInputElement;
 
 //Modale
+/*
 modal!.addEventListener("submit", (event) => {
   event.preventDefault();
   let data = {
@@ -263,7 +253,7 @@ modal!.addEventListener("submit", (event) => {
 
   modal!.style.display = "none";
   getTask();
-});
+});*/
 
 //Chiusura della modale
 closemodal!.addEventListener("click", () => {
@@ -277,7 +267,53 @@ window.onclick = (event) => {
 
 /*TODO: Manca da collegare la 
 modifica
-cancellazione
+
 */
 
-//modifica
+//modifica il pulsante salva della modifica non va
+
+modalbtn!.addEventListener("click", (event) => {
+  event.preventDefault();
+  editRow();
+});
+
+function editRow() {
+  targetTask = msgData.takeMsg("targetTask");
+  console.log(targetTask);
+  let data = {
+    id: targetTask["id"],
+    titolo: modtitolo?.value,
+    scadenza: modscadenza?.value,
+    stato: modstatus?.value,
+    teamid: +modteamid?.value,
+  };
+  console.log(data);
+
+  fetch("http://127.0.0.1:5000/updateTask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+    });
+  //modificare la riga scelta
+  let rowData = {
+    titolo: data["titolo"],
+    cognome: members[data.teamid]["cognome"],
+    stato: data["stato"],
+    assegnazione: targetTask.assegnazione,
+    scadenza: data["scadenza"],
+    id: targetTask.id,
+    nome: members[data.teamid]["nome"],
+  };
+
+  pTable.editRowById(targetTask["id"], rowData);
+  pTable.renderRow();
+  modal!.style.display = "none";
+}
