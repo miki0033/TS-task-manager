@@ -176,6 +176,7 @@ export class divSelect extends DOMElement {
   pDiv: HTMLDivElement;
   pLabel: HTMLLabelElement;
   pSelect: HTMLSelectElement;
+  pOptions: HTMLOptionElement[] = [];
   constructor(options: divSelectOptions, children?: HTMLElement[]) {
     super();
     this.pDiv = document.createElement("div");
@@ -221,6 +222,7 @@ export class divSelect extends DOMElement {
         pOption.value = opt.value;
         pOption.text = opt.optionText;
         this.pSelect.append(pOption);
+        this.pOptions.push(pOption);
       });
     }
 
@@ -234,5 +236,18 @@ export class divSelect extends DOMElement {
   }
   public getInputNode() {
     return this.pSelect;
+  }
+
+  /**
+   * optionSelected
+   */
+  public optionSelected(value: string) {
+    //console.log(value);
+
+    this.pOptions.forEach((opt) => {
+      if (opt.text == value) {
+        opt.selected = true;
+      }
+    });
   }
 }

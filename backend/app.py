@@ -78,10 +78,22 @@ def assegnazioneTask():
     insert = Task(
         titolo=titolo, assegnazione=assegnazione, scadenza=scadenza, teamid=teamid
     )
-    # print(insert)
+
     db.session.add(insert)
     db.session.commit()
-    response = jsonify({"msg": "Task registrata", "code": 201})
+
+    response = jsonify(
+        {
+            "msg": "Task registrata",
+            "code": 201,
+            "titolo": titolo,
+            "time": time,
+            "assegnazione": insert.assegnazione,
+            "scadenza": scadenza,
+            "teamid": teamid,
+            "id": insert.id,
+        }
+    )
     return response
 
 
@@ -138,8 +150,8 @@ def updateTask():
 @app.route("/deleteTask", methods=["POST"])
 def deleteTask():
     id = request.json["id"]
-    # fare un update cambiando lo statodi flag a false
+    # fare un update cambiando lo stato di flag a false
     update = Task.query.filter_by(id=id).update(dict(flag=False))
     db.session.commit()
-    response = jsonify({"msg": "Task cancellata", "code": 204})
+    response = jsonify({"msg": "Task cancellata", "code": 201})
     return response

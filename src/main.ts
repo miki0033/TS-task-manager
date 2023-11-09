@@ -8,11 +8,17 @@ import * as Button from "./button.ts";
 import { Div } from "./div.ts";
 import { Title, TitleAttribute } from "./title.ts";
 import { Table, TableOptions } from "./table.ts";
+import { msgData } from "./msgData.ts";
 //selector
 const pApp = document.querySelector<HTMLDivElement>("#app");
 const pAppTable = document.querySelector<HTMLDivElement>("#table");
 const modal = document.querySelector<HTMLDivElement>("#modal");
 const closemodal = document.querySelector<HTMLButtonElement>("#close");
+const modalselect = document.querySelector("#select");
+//Stato
+let targetTask: any;
+let members: any = [];
+
 //Creazione HTML
 const div1 = new Div(classIntoList("flex flex-col items-center"));
 pApp?.appendChild(div1.getNode());
@@ -81,11 +87,21 @@ let tableOptions: TableOptions = {
 };
 const pTable = new Table(tableOptions);
 pAppTable?.appendChild(pTable.getNode());
-//Stato
-let targetTask: any;
 
 //MAIN
 getTask();
+let optionSel: Form.divSelectOptions = {
+  labelText: "Assegna a:",
+  selectName: "teammember",
+  inputId: "teamlist",
+  selectClass: classIntoList("border border-gray-300 rounded-md p-2"),
+  options: optionData(await getMember()),
+};
+const modalmember = new Form.divSelect(optionSel);
+//console.log(msgData.takeMsg("selectedMember"));
+msgData.storeMsg("modalmember", modalmember);
+modalselect?.appendChild(modalmember.getNode());
+
 //FUNZIONI
 function classIntoList(cls: string): string[] {
   const lst: string[] = cls.split(" ");
@@ -107,8 +123,22 @@ async function getMember(): Promise<any> {
     .then((data) => {
       return data;
     });
-
+  members = await dt;
   return await dt;
+}
+
+function getMemberbyId(id: string) {
+  let element = undefined;
+  console.log(members);
+
+  for (let index = 0; index < members.length; index++) {
+    console.log(members[index]["id"]);
+    console.log(id);
+    if (members[index]["id"] == id) {
+      element = members[index];
+    }
+  }
+  return element;
 }
 
 function optionData(data: any): Form.optionData[] {
@@ -139,7 +169,7 @@ function setTask() {
     scadenza: pScadenzaInput.value,
     teamid: +pSelectInput.value,
   };
-  console.log(JSON.stringify(data));
+  //console.log(JSON.stringify(data));
 
   fetch("http://127.0.0.1:5000/setTask", {
     method: "POST",
@@ -153,7 +183,17 @@ function setTask() {
       return response.json();
     })
     .then((data) => {
-      pTable.createRow(data);
+      let newdata = {
+        titolo: data["titolo"],
+        cognome: getMemberbyId(data["teamid"])["cognome"],
+        stato: "ToDo",
+        assegnazione: data["assegnazione"],
+        scadenza: data["scadenza"],
+        id: data["id"],
+        nome: getMemberbyId(data["teamid"])["nome"],
+      };
+
+      pTable.createRow(newdata);
     });
 }
 
@@ -216,11 +256,10 @@ modal!.addEventListener("submit", (event) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {});
+  }).then((response) => {
+    return response.json();
+  });
+  //.then((data) => {});
 
   modal!.style.display = "none";
   getTask();
@@ -230,8 +269,15 @@ modal!.addEventListener("submit", (event) => {
 closemodal!.addEventListener("click", () => {
   modal!.style.display = "none";
 });
-window.onclick = function (event) {
+window.onclick = (event) => {
   if (event.target == modal) {
     modal!.style.display = "none";
   }
 };
+
+/*TODO: Manca da collegare la 
+modifica
+cancellazione
+*/
+
+//modifica

@@ -1,6 +1,8 @@
 import DOMElement from "./DOMElement.ts";
 import { Button } from "./button.ts";
 import { ButtonOptions } from "./button.ts";
+
+import { msgData } from "./msgData.ts";
 //import { editTask, deleteTask } from "./main.ts";
 
 const modal = document.querySelector<HTMLDivElement>("#modal");
@@ -101,12 +103,14 @@ export class Table extends DOMElement {
   public createRow(rowData: any) {
     let tr = document.createElement("tr");
     this.bodyRow.push(tr);
+    console.log(rowData);
 
     this.rowsData.push(rowData);
-    console.log(this.getRowsData());
+    //console.log(this.getRowsData());
     for (let index = 0; index < Object.keys(rowData).length - 2; index++) {
       const th = document.createElement("td");
       tr.appendChild(th);
+      console.log(fieldRowData[index]);
 
       th.textContent = rowData[fieldRowData[index]];
       th.id = String(index);
@@ -145,7 +149,7 @@ export class Table extends DOMElement {
         "px-4",
         "active:bg-red-600",
       ],
-      onClick: this.deleteTask,
+      onClick: this.editTask,
     };
     const btn2 = new Button(btnOption2);
     btn2.addAttribute("data-task", rowData["id"]);
@@ -168,15 +172,24 @@ export class Table extends DOMElement {
       this.ptbody.appendChild(prow);
     });
   }
+  private removeRowById(id: any) {
+    for (let i = 0; i < this.bodyRow.length; i++) {
+      if (this.bodyRow[i].id == id) {
+        let spliced = this.bodyRow.splice(i, 1);
+        return spliced;
+      }
+    }
+    return undefined;
+  }
 
   //EDIT
   public editTask = (e: any) => {
     let targetTask: any;
     const clicked = e.target as Element;
-    console.log(this);
+    //console.log(this);
     if (clicked.hasAttribute("data-task")) {
       const id = clicked.getAttribute("data-task");
-      console.log(id);
+      //console.log(id);
       //predere il campo dell' array con quell'id
       console.log(this.rowsData);
 
@@ -185,10 +198,14 @@ export class Table extends DOMElement {
           targetTask = el;
         }
       });
-      console.log(targetTask);
+      //console.log(targetTask);
+      const modalmember = msgData.takeMsg("modalmember");
+      //console.log(modalmember);
+
+      modalmember.optionSelected(targetTask.nome + " " + targetTask.cognome);
 
       if (clicked.classList.contains("edit")) {
-        console.log("edit");
+        //console.log("edit");
         modal!.style.display = "block";
         const modtitolo = document.querySelector(
           "#modtitolo"
@@ -199,8 +216,10 @@ export class Table extends DOMElement {
         ) as HTMLInputElement;
         modscadenza.value = targetTask["scadenza"];
       } else if (clicked.classList.contains("delete")) {
-        console.log("delete");
+        //console.log("delete");
         if (id) {
+          console.log(id);
+
           this.deleteTask(parseInt(id));
         }
       }
@@ -208,8 +227,10 @@ export class Table extends DOMElement {
   };
 
   //Delete
-  public deleteTask(id: number) {
+  public deleteTask = (id: number) => {
     //TODO
+    console.log(id);
+
     let data = {
       id: id,
     };
@@ -223,8 +244,8 @@ export class Table extends DOMElement {
       .then((response) => {
         return response.json();
       })
-      .then((data) => {
-        //getTask();
+      .then(() => {
+        this.removeRowById(id);
       });
-  }
+  };
 }
